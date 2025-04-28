@@ -14,7 +14,6 @@ const db = {
   },
 
   getTaskById: async (id) => {
-    // Replace with actual database query
     return {
       id,
       title: "Sample Task",
@@ -50,7 +49,6 @@ app.get("/api/tasks", async (req, res) => {
   }
 });
 
-// **GET /api/tasks/:id** - Get a specific task by ID
 app.get("/api/tasks/:id", async (req, res) => {
   const { id } = req.params;
   try {
@@ -64,7 +62,6 @@ app.get("/api/tasks/:id", async (req, res) => {
   }
 });
 
-// **POST /api/tasks** - Create a new task
 app.post("/api/tasks", async (req, res) => {
   const newTask = req.body;
   try {
@@ -75,7 +72,6 @@ app.post("/api/tasks", async (req, res) => {
   }
 });
 
-// **PUT /api/tasks/:id** - Update an existing task
 app.put("/api/tasks/:id", async (req, res) => {
   const { id } = req.params;
   const updatedTask = req.body;
@@ -90,7 +86,6 @@ app.put("/api/tasks/:id", async (req, res) => {
   }
 });
 
-// **DELETE /api/tasks/:id** - Delete a task
 app.delete("/api/tasks/:id", async (req, res) => {
   const { id } = req.params;
   try {
@@ -104,7 +99,6 @@ app.delete("/api/tasks/:id", async (req, res) => {
   }
 });
 
-// Start the server
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
 });
