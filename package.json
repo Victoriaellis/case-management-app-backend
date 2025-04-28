@@ -1,0 +1,23 @@
+{
+  "name": "case-management-app-backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Victoriaellis/case-management-app-backend.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Victoriaellis/case-management-app-backend/issues"
+  },
+  "homepage": "https://github.com/Victoriaellis/case-management-app-backend#readme",
+  "dependencies": {
+    "express": "^5.1.0"
+  }
+}
