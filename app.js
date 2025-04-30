@@ -36,17 +36,17 @@ app.get("/api/task/:id", async (req, res) => {
 });
 
 app.post("/api/tasks", async (req, res) => {
-  const { title, description, complete, dueDate } = req.body;
+  const { title, description, complete, due_date } = req.body;
   try {
     const result = await pool.query(
       `INSERT INTO tasks (title, description, complete, due_date)
        VALUES ($1, $2, $3, $4)
        RETURNING *`,
-      [title, description || null, complete ?? false, dueDate]
+      [title, description || null, complete ?? false, due_date]
     );
     res.status(201).json(result.rows[0]);
   } catch (error) {
-    res.status(500).json({ message: "Error creating task" });
+    res.status(500).json({ message: "Error creating task" }, error);
   }
 });
 
