@@ -4,15 +4,10 @@ import cors from "cors";
 import pool from "./database/index.js";
 
 const app = express();
-const port = 3000;
 
 app.use(cors());
 
 app.use(bodyParser.json());
-
-app.get("/", async (req, res) => {
-  res.send("hello");
-});
 
 app.get("/api/tasks", async (req, res) => {
   try {
@@ -88,6 +83,4 @@ app.delete("/api/tasks/:id", async (req, res) => {
   }
 });
 
-app.listen(port, () => {
-  console.log(`Server running on http://localhost:${port}`);
-});
+export default app;
