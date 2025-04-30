@@ -1,40 +1,14 @@
 import express from "express";
 import bodyParser from "body-parser";
 import cors from "cors";
+import pool from "./database/index.js";
 
 const app = express();
 const port = 3000;
 
 app.use(cors());
+
 app.use(bodyParser.json());
-
-const db = {
-  getAllTasks: async () => {
-    return [];
-  },
-
-  getTaskById: async (id) => {
-    return {
-      id,
-      title: "Sample Task",
-      description: "This is a sample task",
-      status: "Complete",
-      DueDate: "01/08/2025",
-    };
-  },
-
-  createTask: async (task) => {
-    return { id: 1, ...task };
-  },
-
-  updateTask: async (id, task) => {
-    return { id, ...task };
-  },
-
-  deleteTask: async (id) => {
-    return { success: true };
-  },
-};
 
 app.get("/", async (req, res) => {
   res.send("hello");
@@ -42,31 +16,40 @@ app.get("/", async (req, res) => {
 
 app.get("/api/tasks", async (req, res) => {
   try {
-    const tasks = await db.getAllTasks();
-    res.json(tasks);
+    const result = await pool.query(
+      "SELECT * FROM tasks ORDER BY due_date ASC"
+    );
+    res.json(result.rows);
   } catch (error) {
     res.status(500).json({ message: "Error fetching tasks" });
   }
 });
 
-app.get("/api/tasks/:id", async (req, res) => {
+app.get("/api/task/:id", async (req, res) => {
   const { id } = req.params;
   try {
-    const task = await db.getTaskById(id);
-    if (!task) {
+    const result = await pool.query("SELECT * FROM tasks WHERE id = $1", [id]);
+
+    if (result.rows.length === 0) {
       return res.status(404).json({ message: "Task not found" });
     }
-    res.json(task);
+
+    res.json(result.rows[0]);
   } catch (error) {
     res.status(500).json({ message: "Error fetching task" });
   }
 });
 
 app.post("/api/tasks", async (req, res) => {
-  const newTask = req.body;
+  const { title, description, complete, dueDate } = req.body;
   try {
-    const createdTask = await db.createTask(newTask);
-    res.status(201).json(createdTask);
+    const result = await pool.query(
+      `INSERT INTO tasks (title, description, complete, due_date)
+       VALUES ($1, $2, $3, $4)
+       RETURNING *`,
+      [title, description || null, complete ?? false, dueDate]
+    );
+    res.status(201).json(result.rows[0]);
   } catch (error) {
     res.status(500).json({ message: "Error creating task" });
   }
@@ -74,13 +57,16 @@ app.post("/api/tasks", async (req, res) => {
 
 app.put("/api/tasks/:id", async (req, res) => {
   const { id } = req.params;
-  const updatedTask = req.body;
+  const { complete } = req.body;
   try {
-    const task = await db.updateTask(id, updatedTask);
-    if (!task) {
+    const result = await pool.query(
+      `UPDATE tasks SET complete = $1 WHERE id = $2 RETURNING *`,
+      [complete, id]
+    );
+    if (result.rows.length === 0) {
       return res.status(404).json({ message: "Task not found" });
     }
-    res.json(task);
+    res.json(result.rows[0]);
   } catch (error) {
     res.status(500).json({ message: "Error updating task" });
   }
@@ -89,8 +75,11 @@ app.put("/api/tasks/:id", async (req, res) => {
 app.delete("/api/tasks/:id", async (req, res) => {
   const { id } = req.params;
   try {
-    const result = await db.deleteTask(id);
-    if (!result.success) {
+    const result = await pool.query(
+      `DELETE FROM tasks WHERE id = $1 RETURNING *`,
+      [id]
+    );
+    if (result.rows.length === 0) {
       return res.status(404).json({ message: "Task not found" });
     }
     res.status(204).send();
