@@ -37,6 +37,23 @@ app.get("/api/task/:id", async (req, res) => {
 
 app.post("/api/tasks", async (req, res) => {
   const { title, description, complete, due_date } = req.body;
+  if (typeof title !== "string" || title.trim() === "") {
+    return res.status(400).json({ message: "Title is required" });
+  }
+
+  if (description !== undefined && typeof description !== "string") {
+    return res.status(400).json({ message: "Description must be a string" });
+  }
+
+  if (complete !== undefined && typeof complete !== "boolean") {
+    return res.status(400).json({ message: "Complete must be a boolean" });
+  }
+
+  if (due_date && isNaN(Date.parse(due_date))) {
+    return res
+      .status(400)
+      .json({ message: "Due date must be a valid date string" });
+  }
   try {
     const result = await pool.query(
       `INSERT INTO tasks (title, description, complete, due_date)
@@ -53,6 +70,11 @@ app.post("/api/tasks", async (req, res) => {
 app.put("/api/tasks/:id", async (req, res) => {
   const { id } = req.params;
   const { complete } = req.body;
+
+  if (complete !== undefined && typeof complete !== "boolean") {
+    return res.status(400).json({ message: "Complete must be a boolean" });
+  }
+
   try {
     const result = await pool.query(
       `UPDATE tasks SET complete = $1 WHERE id = $2 RETURNING *`,

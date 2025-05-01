@@ -14,7 +14,7 @@ describe("POST /api/tasks", () => {
       title: "Test Task",
       description: "This is a test",
       complete: false,
-      dueDate: "2025-05-01",
+      due_date: "2025-05-01",
     };
 
     const res = await request(app).post("/api/tasks").send(newTask);
